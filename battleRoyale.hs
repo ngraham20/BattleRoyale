@@ -1,93 +1,55 @@
--- function to create a character
--- has name, str, def, agi, hp, and mp
-person(name, str, def, agi, hp, max_hp, mp, max_mp) =
-  (\message -> message (name, str, def, agi, hp, max_hp, mp, max_mp))
+import qualified PrintScreen
 
-jason = person("Jason", 10, 5, 6, 20, 20, 20, 20)
-harpy = person("Harpy", 10, 5, 10, 40, 40, 10, 10)
+-- create character
+-- name, str, def, agi, hp, max_hp, mp, and max_mp
+character(name, str, def, agi, hp, max_hp, mp, max_mp) =
+  (name, str, def, agi, hp, max_hp, mp, max_mp)
 
-apolo = person("Apolo", 20, 10, 8, 20, 20, 20, 20)
-titan = person("Titan", 30, 20, 0, 100, 100, 30, 30)
+jason = character("Jason", 10, 5, 6, 20, 20, 20, 20)
+harpy = character("Harpy", 10, 5, 10, 40, 40, 10, 10)
 
--- function for each attribute in character
-name(n, _, _, _, _, _, _, _) = n
-str(_, at, _, _, _, _, _, _) = at
-def(_, _, d, _, _, _, _, _) = d
-agi(_, _, _, ag, _, _, _, _) = ag
-hp(_, _, _, _, h, _, _, _) = h
-mhp(_, _, _, _, _, mh, _, _) = mh
-mp(_, _, _, _, _, _, m, _) = m
-mmp(_, _, _, _, _, _, _, mm) = mm
+apolo = character("Apolo", 20, 10, 8, 20, 20, 20, 20)
+titan = character("Titan", 30, 20, 0, 100, 100, 30, 30)
 
--- functions to get character stats
-getName character = character name
-getStr character = character str
-getDef character = character def
-getAgi character = character agi
-getHp character = character hp
-getMaxHp character = character mhp
-getMp character = character mp
-getMaxMp character = character mmp
+getName(n, _, _, _, _, _, _, _) = n
+getStr(_, at, _, _, _, _, _, _) = at
+getDef(_, _, d, _, _, _, _, _) = d
+getAgi(_, _, _, ag, _, _, _, _) = ag
+getHp(_, _, _, _, h, _, _, _) = h
+getMaxHp(_, _, _, _, _, mh, _, _) = mh
+getMp(_, _, _, _, _, _, m, _) = m
+getMaxMp(_, _, _, _, _, _, _, mm) = mm
 
--- function to create skills
--- name, att+/- def +/- agi+/- hp+/- mp_cost
 skill(name, str, def, agi, hp, cost) =
-  \message -> message(name, str, def, agi, hp, cost)
+  (name, str, def, agi, hp, cost)
 
 restoration = skill("Restoration", 0, 0, 0, 5, 2)
 deepCut = skill("Deep Cut", 0, -2, 0, -5, 7)
 lightArrow = skill("Sun Beam", 0, 0, 0, -10, 10)
 blessingOfTheGods = skill("Blessing of the Gods", 2, 2, 2, 5, 25)
 
--- damage character
-hit character amt =
-  character(\(n, at, d, ag, h, mh, m, mm) ->
-    if d-amt <= 0
-    then if h+d-amt > 0
-         then person(n, at, d, ag, h+d-amt, mh, m, mm)
-         else person(n, at, d, ag, 0, mh, m, mm)
-    else person(n, at, d, ag, h, mh, m, mm))
+damage character amt =
+  (\(n,at,d,ag,h,mh,m,mm) -> if h-amt > 0
+                             then (n,at,d,ag,h-amt, mh, m, mm)
+                             else (n,at,d,ag,0,mh,m,mm)) character
 
 heal character amt =
-  character(\(n, at, d, ag, h, mh, m, mm) ->
-  if h + amt <= mh
-  then person(n, at, d, ag, h+amt, mh, m, mm)
-  else person(n, at, d, ag, mh, mh, m, mm))
+ (\(n,at,d,ag,h,mh,m,mm) -> if h+amt <= mh
+                            then (n,at,d,ag,h+amt,mh,m,mm)
+                            else (n,at,d,ag,mh,mh,m,mm)) character
 
--- reduce mana
 spendMana character amt =
-  character(\(n, at, d, ag, h, mh, m, mm) ->
-    if m-amt > 0
-    then person(n, at, d, ag, h, mh, m-amt, mm)
-    else person(n, at, d, ag, h, mh, 0, mm))
+  (\(n,at,d,ag,h,mh,m,mm) -> if m-amt > 0
+                             then (n,at,d,ag,h,mh,m-amt,mm)
+                             else (n,at,d,ag,mh,mh,0,mm)) character
 
--- function to have one character attack another
-fight attacker defender =
-  hit defender dmg
-    where dmg = getStr attacker
+basicAttack attacker defender =
+  damage defender amt
+  where amt = let str = getStr attacker
+                  def = getDef defender
+              in if str-def > 0
+                 then str-(def `div` 2)
+                 else 0
 
--- function to print the current stats of a character
-printCharacter character =
-    character (\(n, a, d, ag, h, mh, m, mm) ->
-                  putStr("---------------\n" ++
-                  show(n) ++ ":\n" ++
-                  "str: " ++ show(a) ++ "\n" ++
-                  "def: " ++ show(d) ++ "\n" ++
-                  "agi: " ++ show(ag) ++ "\n" ++
-                  "hp: " ++ show(h) ++ "\n" ++
-                  "max hp: " ++ show(mh) ++ "\n" ++
-                  "mp: " ++ show(m) ++ "\n" ++
-                  "max mp: " ++ show(mm) ++ "\n" ++
-                  "---------------\n"))
-
--- printName character =
---   character (\(n, _, _, _, _, _, _, _) ->
---               show(n))
-
-printScreen attacker defender = do
-  putStrLn "-------------------------------------------------------"
-  putStrLn $ "|Player: " ++ name attacker "|"
-  putStrLn "-------------------------------------------------------"
-
-apJas = fight apolo jason
-jasAp = fight jason apolo
+testScreen = PrintScreen.printScreen apolo titan restoration
+                                    deepCut lightArrow blessingOfTheGods
