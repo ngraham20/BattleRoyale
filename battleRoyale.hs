@@ -8,7 +8,7 @@ character(name, str, def, agi, hp, max_hp, mp, max_mp) =
 jason = character("Jason", 10, 5, 6, 20, 20, 20, 20)
 harpy = character("Harpy", 10, 5, 10, 40, 40, 10, 10)
 
-apolo = character("Apolo", 20, 10, 8, 20, 20, 20, 20)
+apolo = character("Apolo", 25, 10, 8, 20, 20, 20, 20)
 titan = character("Titan", 30, 20, 0, 100, 100, 30, 30)
 
 getName(n, _, _, _, _, _, _, _) = n
@@ -51,5 +51,8 @@ basicAttack attacker defender =
                  then str-(def `div` 2)
                  else 0
 
-testScreen = PrintScreen.printScreen apolo titan restoration
+beginingScreen = PrintScreen.printScreen apolo titan restoration
+                                    deepCut lightArrow blessingOfTheGods
+
+apoloAttack01 = PrintScreen.printScreen apolo (basicAttack apolo titan) restoration
                                     deepCut lightArrow blessingOfTheGods

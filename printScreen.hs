@@ -33,12 +33,12 @@ printScreen attacker defender skill01 skill02 skill03 skill04 = do
   putStr(replicate 7 ' ')
 
   -- print second hp block
-  putStrLn("|HP: " ++ show(mp attacker) ++
-    (replicate (17-(length (show (mp attacker)))) ' ') ++ "||")
+  putStrLn("|HP: " ++ show(hp defender) ++
+    (replicate (17-(length (show (hp defender)))) ' ') ++ "||")
 
   -- print first hp block
-  putStr("||MP: " ++ show(hp defender) ++
-    (replicate (17-(length (show (hp defender)))) ' ') ++ "|")
+  putStr("||MP: " ++ show(mp attacker) ++
+    (replicate (17-(length (show (mp attacker)))) ' ') ++ "|")
 
   -- print spaces between boxes
   putStr(replicate 7 ' ')
